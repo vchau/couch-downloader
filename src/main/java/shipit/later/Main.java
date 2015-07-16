@@ -14,10 +14,12 @@ public class Main {
 
 	public static final String ARG_BUCKET = "b";
 	public static final String ARG_OUTPUT_PATH = "o";
+	public static final String ARG_INPUT_PATH = "i";
 	public static final String ARG_COUCH_HOST = "h";
 	public static final String ARG_PASSWORD = "p";
 	public static final String ARG_DOWNLOAD = "download";
 	public static final String ARG_UPLOAD = "upload";
+	public static final String ARG_UPLOAD_VIEWONLY = "uploadviewonly";
 
 	public static void main(String[] args) throws Exception {
 		Options options = new Options();
@@ -27,10 +29,14 @@ public class Main {
 		options.addOption(ARG_BUCKET, true, "(Required) Couch bucket name.");
 		options.addOption(ARG_OUTPUT_PATH, true,
 				"(Optional) Output directory path. Default: /tmp/couchbase");
+		options.addOption(ARG_INPUT_PATH, true,
+				"(Optional) Input directory path. Default: /tmp/couchbase");
 		options.addOption(ARG_DOWNLOAD, false,
 				"(Optional) Download mode. Default: false");
 		options.addOption(ARG_UPLOAD, false,
 				"(Optional) Upload mode. Default: false");
+		options.addOption(ARG_UPLOAD_VIEWONLY, false,
+				"(Optional) Upload views only mode. Default: false");
 
 		CommandLineParser parser = new BasicParser();
 		CommandLine cmd = parser.parse(options, args);
@@ -39,8 +45,10 @@ public class Main {
 		String password = cmd.getOptionValue(ARG_PASSWORD);
 		String outputPath = cmd.getOptionValue(ARG_OUTPUT_PATH,
 				"/tmp/couchbase");
+		String inputPath = cmd.getOptionValue(ARG_INPUT_PATH, "/tmp/couchbase");
 		boolean isDownload = cmd.hasOption(ARG_DOWNLOAD);
 		boolean isUpload = cmd.hasOption(ARG_UPLOAD);
+		boolean isUploadViewOnly = cmd.hasOption(ARG_UPLOAD_VIEWONLY);
 
 		if (host == null || host.isEmpty()) {
 			HelpFormatter formatter = new HelpFormatter();
@@ -49,6 +57,7 @@ public class Main {
 		}
 
 		if (isDownload) {
+			System.out.println("Begin downloading...");
 			File outputDir = new File(outputPath);
 			if (!outputDir.exists()) {
 				outputDir.mkdirs();
@@ -66,6 +75,15 @@ public class Main {
 		} else if (isUpload) {
 			// TODO:
 			System.out.println("TODO: not yet implemented");
+		} else if (isUploadViewOnly) {
+			System.out.println("Uploading views only...");
+			ViewUploader viewUploader = new ViewUploader(host, bucket, password);
+			try {
+				viewUploader.init();
+				viewUploader.upload(inputPath);
+			} finally {
+				viewUploader.shutdown();
+			}
 		} else {
 			System.out
 					.println("Neither -download nor -upload specified. Do nothing.");

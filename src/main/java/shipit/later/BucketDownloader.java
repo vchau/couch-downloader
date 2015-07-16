@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import com.couchbase.client.java.document.StringDocument;
@@ -14,31 +13,12 @@ import com.couchbase.client.java.view.ViewQuery;
 import com.couchbase.client.java.view.ViewResult;
 import com.couchbase.client.java.view.ViewRow;
 
-public class BucketDownloader {
+public class BucketDownloader extends CouchbaseWorker {
 	public static final String DESIGN_DOC = "CouchDownloader";
 	public static final String VIEW = "all_docs";
-	private String host;
-	private String bucket;
-	private String password;
-	private CouchbaseClient client;
 
 	public BucketDownloader(String host, String bucket, String password) {
-		this.host = host;
-		this.bucket = bucket;
-		this.password = password;
-	}
-
-	public void init() throws IOException {
-		List<String> hosts = Arrays.asList(host);
-
-		// Connect to the Cluster
-		client = new CouchbaseClient(hosts, bucket, password);
-
-		client.init();
-	}
-
-	public void shutdown() {
-		client.getCluster().disconnect();
+		super(host, bucket, password);
 	}
 
 	private void downloadViews(String outputPath) throws IOException {
@@ -60,13 +40,20 @@ public class BucketDownloader {
 
 			List<View> listView = dd.views();
 			for (View v : listView) {
-				String viewFileName = designDocDir + "/" + v.name() + ".json";
+				String viewFileName = designDocDir + "/" + v.name()
+						+ ".map.json";
 				FileOutputStream fos = new FileOutputStream(viewFileName);
 				System.out.println("Writing view: " + viewFileName);
 				fos.write(v.map().getBytes());
-				fos.write("\n".getBytes());
 				if (v.reduce() != null) {
-					fos.write(v.reduce().getBytes());
+					String viewReduceFileName = designDocDir + "/" + v.name()
+							+ ".reduce.json";
+					System.out.println("Writing view reduce: "
+							+ viewReduceFileName);
+					FileOutputStream rfos = new FileOutputStream(
+							viewReduceFileName);
+					rfos.write(v.reduce().getBytes());
+					rfos.close();
 				}
 				fos.close();
 			}
