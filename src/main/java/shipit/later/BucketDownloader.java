@@ -67,11 +67,12 @@ public class BucketDownloader extends CouchbaseWorker {
 		ViewQuery viewQuery = ViewQuery.from(DESIGN_DOC, VIEW);
 
 		ViewResult result = client.getBucket().query(viewQuery);
-		String documentFileName = outputPath + Main.OUT_JSON_DOCS_FILENAME;
+		String documentFileName = outputPath + "/"
+				+ Main.OUT_JSON_DOCS_FILENAME;
 		FileOutputStream fos = new FileOutputStream(documentFileName);
 		System.out.println("Writing documents: " + documentFileName);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
-		FileOutputStream kvFile = new FileOutputStream(outputPath
+		FileOutputStream kvFile = new FileOutputStream(outputPath + "/"
 				+ Main.OUT_NONJSON_DOCS_FILENAME);
 		BufferedOutputStream kvBos = new BufferedOutputStream(kvFile);
 
