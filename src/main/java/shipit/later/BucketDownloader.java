@@ -48,8 +48,8 @@ public class BucketDownloader extends CouchbaseWorker {
 				if (v.reduce() != null) {
 					String viewReduceFileName = designDocDir + "/" + v.name()
 							+ ".reduce.json";
-					System.out.println("Writing view reduce: "
-							+ viewReduceFileName);
+					System.out.println(
+							"Writing view reduce: " + viewReduceFileName);
 					FileOutputStream rfos = new FileOutputStream(
 							viewReduceFileName);
 					rfos.write(v.reduce().getBytes());
@@ -72,8 +72,8 @@ public class BucketDownloader extends CouchbaseWorker {
 		FileOutputStream fos = new FileOutputStream(documentFileName);
 		System.out.println("Writing documents: " + documentFileName);
 		BufferedOutputStream bos = new BufferedOutputStream(fos);
-		FileOutputStream kvFile = new FileOutputStream(outputPath + "/"
-				+ Main.OUT_NONJSON_DOCS_FILENAME);
+		FileOutputStream kvFile = new FileOutputStream(
+				outputPath + "/" + Main.OUT_NONJSON_DOCS_FILENAME);
 		BufferedOutputStream kvBos = new BufferedOutputStream(kvFile);
 
 		try {
@@ -87,8 +87,9 @@ public class BucketDownloader extends CouchbaseWorker {
 				} catch (Exception e) {
 					// System.out.println("Error: " + e);
 					if (e instanceof com.couchbase.client.java.error.TranscodingException) {
-						kvBos.write((row.key().toString() + "," + row.document(
-								StringDocument.class).content()).getBytes());
+						kvBos.write((row.key().toString() + ","
+								+ row.document(StringDocument.class).content())
+										.getBytes());
 						kvBos.write("\n".getBytes());
 					}
 				}

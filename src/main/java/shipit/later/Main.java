@@ -73,11 +73,30 @@ public class Main {
 				downloader.shutdown();
 			}
 		} else if (isUpload) {
-			// TODO:
-			System.out.println("TODO: not yet implemented");
+			System.out.println("Uploading document beginning");
+			JsonDocumentUploader jsonUploader = new JsonDocumentUploader(host,
+					bucket, password);
+			try {
+				System.out.print("Uploading json documents...");
+				jsonUploader.init();
+				jsonUploader.upload(inputPath);
+			} finally {
+				jsonUploader.shutdown();
+			}
+
+			NonJsonDocumentUploader nonJsonUploader = new NonJsonDocumentUploader(
+					host, bucket, password);
+			try {
+				System.out.print("Uploading non-json documents...");
+				nonJsonUploader.init();
+				nonJsonUploader.upload(inputPath);
+			} finally {
+				nonJsonUploader.shutdown();
+			}
 		} else if (isUploadViewOnly) {
 			System.out.println("Uploading views only...");
-			ViewUploader viewUploader = new ViewUploader(host, bucket, password);
+			ViewUploader viewUploader = new ViewUploader(host, bucket,
+					password);
 			try {
 				viewUploader.init();
 				viewUploader.upload(inputPath);
@@ -85,8 +104,8 @@ public class Main {
 				viewUploader.shutdown();
 			}
 		} else {
-			System.out
-					.println("Neither -download nor -upload specified. Do nothing.");
+			System.out.println(
+					"Neither -download nor -upload specified. Do nothing.");
 		}
 	}
 }

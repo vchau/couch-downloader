@@ -7,15 +7,15 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import rx.Observable;
-import rx.functions.Func1;
-
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.document.JsonDocument;
 import com.couchbase.client.java.document.RawJsonDocument;
 import com.couchbase.client.java.env.CouchbaseEnvironment;
 import com.couchbase.client.java.env.DefaultCouchbaseEnvironment;
+
+import rx.Observable;
+import rx.functions.Func1;
 
 public class CouchbaseClient {
 	private List<String> hostList;
@@ -24,7 +24,8 @@ public class CouchbaseClient {
 	private CouchbaseCluster cluster;
 	private Bucket bucket;
 
-	public CouchbaseClient(List<String> hostList, String bucketName, String pwd) {
+	public CouchbaseClient(List<String> hostList, String bucketName,
+			String pwd) {
 		this.hostList = hostList;
 		this.bucketName = bucketName;
 		this.password = pwd;
@@ -61,7 +62,8 @@ public class CouchbaseClient {
 		return bucket.insert(RawJsonDocument.create(id, document));
 	}
 
-	public RawJsonDocument insert(String id, Integer ttlInSec, String document) {
+	public RawJsonDocument insert(String id, Integer ttlInSec,
+			String document) {
 		return bucket.insert(RawJsonDocument.create(id, ttlInSec, document));
 	}
 
@@ -69,7 +71,8 @@ public class CouchbaseClient {
 		return bucket.upsert(RawJsonDocument.create(id, document));
 	}
 
-	public RawJsonDocument upsert(String id, Integer ttlInSec, String document) {
+	public RawJsonDocument upsert(String id, Integer ttlInSec,
+			String document) {
 		return bucket.upsert(RawJsonDocument.create(id, ttlInSec, document));
 	}
 
