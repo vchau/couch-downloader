@@ -6,7 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import com.couchbase.client.java.document.StringDocument;
+import com.couchbase.client.java.document.RawJsonDocument;
+import com.couchbase.client.java.error.TranscodingException;
 import com.couchbase.client.java.view.DesignDocument;
 import com.couchbase.client.java.view.View;
 import com.couchbase.client.java.view.ViewQuery;
@@ -80,18 +81,15 @@ public class BucketDownloader extends CouchbaseWorker {
 			// 4: Iterate over the Data and print out the full document
 			for (ViewRow row : result) {
 				try {
-					String csvLine = row.id() + ","
-							+ row.document().content().toString();
+					String csvLine = row.id() + "," + row.document().content().toString();
 					bos.write(csvLine.getBytes());
 					bos.write("\n".getBytes());
+				} catch (TranscodingException e) {
+					kvBos.write((row.key().toString() + "," + row.document(RawJsonDocument.class).content()).getBytes());
+					kvBos.write("\n".getBytes());
 				} catch (Exception e) {
-					// System.out.println("Error: " + e);
-					if (e instanceof com.couchbase.client.java.error.TranscodingException) {
-						kvBos.write((row.key().toString() + ","
-								+ row.document(StringDocument.class).content())
-										.getBytes());
-						kvBos.write("\n".getBytes());
-					}
+					// do nothing
+				    System.out.println("Error: " + e);
 				}
 			}
 		} finally {
