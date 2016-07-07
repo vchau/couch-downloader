@@ -88,8 +88,9 @@ public class BucketDownloader extends CouchbaseWorker {
 					kvBos.write((row.key().toString() + "," + row.document(RawJsonDocument.class).content()).getBytes());
 					kvBos.write("\n".getBytes());
 				} catch (Exception e) {
-					// do nothing
-				    System.out.println("Error: " + e);
+					if (row != null) {
+						System.out.println("Failed to backup id: " + row.id() + " and key: " + row.key());
+					}
 				}
 			}
 		} finally {
