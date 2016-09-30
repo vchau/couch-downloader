@@ -81,10 +81,18 @@ public class BucketDownloader extends CouchbaseWorker {
 			// 4: Iterate over the Data and print out the full document
 			for (ViewRow row : result) {
 				try {
+					if (row.document() == null || row.document().content() == null) {
+						// skip null content
+						continue;
+					}
 					String csvLine = row.id() + "," + row.document().content().toString();
 					bos.write(csvLine.getBytes());
 					bos.write("\n".getBytes());
 				} catch (TranscodingException e) {
+					if (row.document(RawJsonDocument.class) == null || row.document(RawJsonDocument.class).content() == null) {
+						// skip null content
+						continue;
+					}
 					kvBos.write((row.key().toString() + "," + row.document(RawJsonDocument.class).content()).getBytes());
 					kvBos.write("\n".getBytes());
 				} catch (Exception e) {
