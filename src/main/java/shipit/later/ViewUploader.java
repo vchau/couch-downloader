@@ -26,6 +26,12 @@ public class ViewUploader extends CouchbaseWorker {
 					String ddDir = viewDir + "/" + dd;
 					File ddd = new File(ddDir);
 					String[] listViewFiles = ddd.list();
+
+					if (listViewFiles == null) {
+						// no files
+						continue;
+					}
+
 					List<View> viewsToInsert = new ArrayList<View>();
 					for (String viewFileName : listViewFiles) {
 						System.out.println("Found view: " + viewFileName);
