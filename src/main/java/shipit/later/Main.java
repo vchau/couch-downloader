@@ -18,6 +18,7 @@ public class Main {
 	public static final String ARG_COUCH_HOST = "h";
 	public static final String ARG_PASSWORD = "p";
 	public static final String ARG_DOWNLOAD = "download";
+	public static final String ARG_DOWN_SINGLE_DOC = "downloaddoc";
 	public static final String ARG_UPLOAD = "upload";
 	public static final String ARG_UPLOAD_SINGLE_DOC = "uploaddoc";
 	public static final String ARG_TARGET_DOC_ID = "d";
@@ -39,6 +40,7 @@ public class Main {
 				"(Optional) Input directory path. Default: /tmp/couchbase");
 		options.addOption(ARG_DOWNLOAD, false,
 				"(Optional) Download mode. Default: false");
+		options.addOption(ARG_DOWN_SINGLE_DOC, false, "(Optional) Download single document mode. Default: false");
 		options.addOption(ARG_UPLOAD, false,
 				"(Optional) Upload mode. Default: false");
 		options.addOption(ARG_UPLOAD_SINGLE_DOC, false, "(Optional) Upload single document mode. Default: false");
@@ -62,6 +64,7 @@ public class Main {
 		boolean isDownload = cmd.hasOption(ARG_DOWNLOAD);
 		boolean isUpload = cmd.hasOption(ARG_UPLOAD);
 		String docId = cmd.getOptionValue(ARG_TARGET_DOC_ID);
+		boolean isDownloadSingleDoc = cmd.hasOption(ARG_DOWN_SINGLE_DOC);
 		boolean isUploadSingleDoc = cmd.hasOption(ARG_UPLOAD_SINGLE_DOC);
 		boolean isUploadViewOnly = cmd.hasOption(ARG_UPLOAD_VIEWONLY);
 		boolean isCopyDoc = cmd.hasOption(ARG_COPY_DOC);
@@ -111,6 +114,16 @@ public class Main {
 				nonJsonUploader.upload(inputPath);
 			} finally {
 				nonJsonUploader.shutdown();
+			}
+		} else if (isDownloadSingleDoc) {
+			System.out.println("Downloading single document");
+			SingleDocumentDownloader jsonDownloader = new SingleDocumentDownloader(host, bucket, password);
+			try {
+				System.out.print("Downloading single json documents...");
+				jsonDownloader.init();
+				jsonDownloader.download(docId, outputPath);
+			} finally {
+				jsonDownloader.shutdown();
 			}
 		} else if (isUploadSingleDoc) {
 			System.out.println("Uploading single document");
