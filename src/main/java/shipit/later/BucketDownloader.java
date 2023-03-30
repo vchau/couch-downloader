@@ -101,6 +101,11 @@ public class BucketDownloader extends CouchbaseWorker {
 					}
 				}
 			}
+		} catch (Exception e) {
+			//unexpected
+			System.out.println("Caught unexpected exception: " + e.getMessage());
+			e.printStackTrace();
+			throw e;
 		} finally {
 			bos.close();
 			kvBos.close();
