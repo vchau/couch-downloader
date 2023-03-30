@@ -79,6 +79,8 @@ public class BucketDownloader extends CouchbaseWorker {
 
 		try {
 			// 4: Iterate over the Data and print out the full document
+			long flushCount = 0;
+			long kvFlushCount = 0;
 			for (ViewRow row : result) {
 				try {
 					if (row.document() == null || row.document().content() == null) {
@@ -88,6 +90,11 @@ public class BucketDownloader extends CouchbaseWorker {
 					String csvLine = row.id() + "," + row.document().content().toString();
 					bos.write(csvLine.getBytes());
 					bos.write("\n".getBytes());
+
+					flushCount = ++flushCount % 5000;
+					if (flushCount == 0) {
+						bos.flush();
+					}
 				} catch (TranscodingException e) {
 					if (row.document(RawJsonDocument.class) == null || row.document(RawJsonDocument.class).content() == null) {
 						// skip null content
@@ -95,6 +102,10 @@ public class BucketDownloader extends CouchbaseWorker {
 					}
 					kvBos.write((row.key().toString() + "," + row.document(RawJsonDocument.class).content()).getBytes());
 					kvBos.write("\n".getBytes());
+					kvFlushCount = ++kvFlushCount % 5000;
+					if (kvFlushCount == 0) {
+						kvBos.flush();
+					}
 				} catch (Exception e) {
 					if (row != null) {
 						System.out.println("Failed to backup id: " + row.id() + " and key: " + row.key());
